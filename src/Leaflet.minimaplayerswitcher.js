@@ -6,7 +6,7 @@
 */
 (function () {
 
-	L.Control.MiniMapLayers = L.Control.extend({
+	L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 		_className: 'leaflet-mini-map-control-layers',
 
 		options: {
@@ -406,7 +406,7 @@
 		}
 	});
 
-	L.control.miniMapLayers = function (baseLayers, options) {
+	L.control.miniMapLayerSwitcher = function (baseLayers, options) {
 		return new L.Control.MiniMapLayers(baseLayers, options);
 	};
 
