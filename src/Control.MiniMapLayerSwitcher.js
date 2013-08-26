@@ -401,5 +401,5 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 });
 
 L.control.miniMapLayerSwitcher = function (baseLayers, options) {
-	return new L.Control.MiniMapLayers(baseLayers, options);
+	return new L.Control.MiniMapLayerSwitcherVersion(baseLayers, options);
 };
