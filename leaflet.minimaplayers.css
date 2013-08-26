@@ -1,0 +1,83 @@
+/* layers control */
+
+.leaflet-mini-map-control-layers {
+	opacity: 0.9;
+}
+
+.leaflet-mini-map-control-layers .map-container {
+	border-radius: 4px;
+	cursor: pointer;
+	box-shadow: 0 1px 7px #999;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+		top: 0;
+		left: 0;
+	visibility: hidden;
+	
+	-webkit-transition: all 0.3s ease-in-out;
+	   -moz-transition: all 0.3s ease-in-out;
+	    -ms-transition: all 0.3s ease-in-out;
+	     -o-transition: all 0.3s ease-in-out;
+	        transition: all 0.3s ease-in-out;
+}
+
+.leaflet-mini-map-control-layers .map-container-inner {
+	border-radius: 4px;
+	overflow: hidden;
+
+	/* fixes clipping of border-radius overflow in webkit */
+	-webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
+}
+
+.leaflet-mini-map-control-layers.expanded .map-container {
+	opacity: 1;
+	visibility: visible;
+}
+
+.leaflet-mini-map-control-layers .active-map .leaflet-container {
+	cursor: default;
+}
+
+.leaflet-mini-map-control-layers .active-map {
+	cursor: default;
+	border: 1px solid white;
+	margin: -1px 0 0 -1px;
+}
+
+.leaflet-mini-map-control-layers .default-map {
+	opacity: 1;
+	visibility: visible;
+	z-index: 1;
+}
+
+.leaflet-mini-map-control-layers.notransition .map-container {
+	-webkit-transition: none !important;
+	   -moz-transition: none !important;
+	    -ms-transition: none !important;
+	     -o-transition: none !important;
+	        transition: none !important;
+}
+
+.leaflet-mini-map-control-layers .map {
+	background-color: #fff;
+	cursor: pointer;
+}
+
+.leaflet-mini-map-control-layers .map-container:hover .map-label {
+	background-color: rgba(0, 0, 0, 0.44);
+}
+
+.leaflet-mini-map-control-layers .map-label,
+.leaflet-mini-map-control-layers .active-map:hover .map-label {
+	background-color: #000;
+	background-color: rgba(0, 0, 0, 0.33);
+	border-top: 1px solid white;
+	color: white;
+	line-height: 18px;
+	overflow: hidden;
+	padding: 0 3px;
+	text-align: center;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}

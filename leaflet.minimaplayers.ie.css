@@ -1,0 +1,16 @@
+/* layers control */
+
+.leaflet-mini-map-control-layers {
+	/* > ie8 receive a mouseleave event when moving between minimaps if there's a transparent background */
+	background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7);
+}
+
+.leaflet-mini-map-control-layers .map-container:hover .map-label {
+	filter: alpha(opacity=44);
+}
+
+.leaflet-mini-map-control-layers .map-label,
+.leaflet-mini-map-control-layers .active-map:hover .map-label {
+	background-color: #000;
+	filter: alpha(opacity=33);
+}
