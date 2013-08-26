@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Leaflet.minimaplayerswitcher example</title>
+
+	<link rel="stylesheet" href="libs/leaflet/leaflet.css" />
+	<!--[if lte IE 8]><link rel="stylesheet" href="libs/leaflet/leaflet.ie.css" /><![endif]-->
+	<link rel="stylesheet" href="../dist/leaflet.minimaplayers.css" />
+	<!--[if lte IE 8]><link rel="stylesheet" href="../dist/leaflet.minimaplayers.ie.css" /><![endif]-->
+	
+	<script src="libs/leaflet/leaflet-src.js"></script>
+
+	<script src="../src/Leaflet.minimaplayerswitcher.js"></script>
+</head>
+<body>
+	<div id="map" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
+	<script>
+		
+		// create a map in the "map" div, set the view to a given place and zoom
+		var map = L.map('map').setView([51.505, -0.09], 13);
+
+		// add an OpenStreetMap tile layer
+		var cloudmade = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+			attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+		});
+
+		// add an OpenStreetMap tile layer
+		var osm = L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
+			attribution: '<a href="http://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> | Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
+		});
+
+		L.control.miniMapLayers({
+			'CloudMade': cloudmade,
+			'OpenStreetMap': osm
+		}, {
+			position: 'bottomleft'
+		}).addTo(map);
+	</script>
+</body>
+</html>
