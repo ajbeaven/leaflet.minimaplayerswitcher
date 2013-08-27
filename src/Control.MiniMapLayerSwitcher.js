@@ -239,13 +239,16 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 		var lastActiveLayerId = this._activeLayerId,
 			lastActiveLayer = this._findLayer(lastActiveLayerId),
 			newActiveLayer = this._findLayer(newActiveLayerId),
-			lastActiveMiniMapContainer = this._getMiniMapContainer(lastActiveLayerId),
 			newActiveMiniMapContainer = this._getMiniMapContainer(newActiveLayerId),
-			mapContainer;
+			mapContainer, suggestedLayerId, suggestedMiniMapContainer;
 
 		this._moveLayerToBack(newActiveLayer);
 
-		this._defaultLayerId = lastActiveLayerId;
+		// Get the new suggested layer vars
+		suggestedLayerId = this._layers[0].id;
+		suggestedMiniMapContainer = this._getMiniMapContainer(suggestedLayerId);
+
+		this._defaultLayerId = suggestedLayerId;
 		this._activeLayerId = newActiveLayerId;
 
 		// set classes for the relevant minimaps
@@ -257,27 +260,26 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 		});
 
 		L.DomUtil.addClass(newActiveMiniMapContainer, 'active-map');
-		L.DomUtil.addClass(lastActiveMiniMapContainer, 'default-map');
+		L.DomUtil.addClass(suggestedMiniMapContainer, 'default-map');
 
 		// maps cannot share the same layer, so remove the layers from any map
 		this._map.removeLayer(lastActiveLayer.mainMapLayer);
 		this._map.addLayer(newActiveLayer.mainMapLayer);
 	},
 
-	_moveLayerToBack: function (layer) {
-		var layerId = layer.id,
+	_moveLayerToBack: function (activeLayer) {
+		var activeLayerId = activeLayer.id,
 			layers = this._layers,
 			layerCount = layers.length,
 			i;
 
 		for (i = 0; i < layerCount; i++) {
-			if (layers[i].id === layerId) {
-				layers.splice(i, 1);
+			if (layers[i].id === activeLayerId) {
+				activeLayer = layers.splice(i, 1)[0];
+				layers.push(activeLayer);
 				break;
 			}
 		}
-
-		layers.push(layer);
 	},
 
 	_animateMiniMaps: function (expand) {
