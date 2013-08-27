@@ -14,7 +14,7 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 	initialize: function (baseLayers, options) {
 		L.setOptions(this, options);
 
-		this._layers = {};
+		this._layers = [];
 		this._miniMaps = {};
 		this._lastZIndex = 0;
 
@@ -99,8 +99,7 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 			miniMap = this._mapContainer = L.DomUtil.create('div', 'map'),
 			miniMapLabel = L.DomUtil.create('div', 'map-label'),
 			layerId = layerObj.id,
-			layers = this._layers,
-			layer = layers[layerId];
+			layer = this._findLayer(layerId);
 
 		L.DomEvent.on(miniMapContainer, 'click', this._onMiniMapClicked, this);
 
@@ -147,12 +146,6 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 		var id = L.stamp(layer),
 			i, clonedLayer, layerGroupLayer;
 
-		this._layers[id] = {
-			id: id,
-			name: name,
-			mainMapLayer: layer
-		};
-
 		if (layer instanceof L.LayerGroup) {
 			clonedLayer = new L.LayerGroup();
 			for (i in layer._layers) {
@@ -165,12 +158,33 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 			clonedLayer = new L.TileLayer(layer._url, layer.options);
 		}
 
-		this._layers[id].miniMapLayer = clonedLayer;
+		this._layers.push({
+			id: id,
+			name: name,
+			mainMapLayer: layer,
+			miniMapLayer: clonedLayer
+		});
 
 		if (this.options.autoZIndex && layer.setZIndex) {
 			this._lastZIndex++;
 			layer.setZIndex(this._lastZIndex);
 		}
+	},
+
+	_findLayer: function (layerId) {
+		var layers = this._layers,
+			layerCount = layers.length,
+			i, layer;
+
+		for (i = 0; i < layerCount; i++) {
+			layer = layers[i];
+			if (layer.id === layerId) {
+				return layer;
+			}
+		}
+
+		// Returns null if we can't find the layer
+		return null;
 	},
 
 	_getCurrentTarget: function (event) {
@@ -206,7 +220,7 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 			return;
 		}
 
-		clickedMainMapLayer = this._layers[clickedLayerId];
+		clickedMainMapLayer = this._findLayer(clickedLayerId);
 
 		// ensure that if we swap between main/mini maps that it's super quick rather than a transition
 		L.DomUtil.addClass(container, 'notransition');
@@ -223,8 +237,8 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 
 	_switchLayer: function (newActiveLayerId) {
 		var lastActiveLayerId = this._activeLayerId,
-			lastActiveLayer = this._layers[lastActiveLayerId],
-			newActiveLayer = this._layers[newActiveLayerId],
+			lastActiveLayer = this._findLayer(lastActiveLayerId),
+			newActiveLayer = this._findLayer(newActiveLayerId),
 			lastActiveMiniMapContainer = this._getMiniMapContainer(lastActiveLayerId),
 			newActiveMiniMapContainer = this._getMiniMapContainer(newActiveLayerId),
 			mapContainer;
@@ -326,10 +340,11 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 
 	_forEachLayer: function (callback) {
 		var layers = this._layers,
-			layer, layerId;
+			layerCount = layers.length,
+			layer, i;
 
-		for (layerId in layers) {
-			layer = layers[layerId];
+		for (i = 0; i < layerCount; i++) {
+			layer = layers[i];
 
 			if (callback.call(this, layer) === false) {
 				break;
@@ -386,17 +401,7 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 	},
 
 	_hasMultipleLayers: function () {
-		var layers = this._layers,
-			count = 0,
-			layerId;
-
-		for (layerId in layers) {
-			count++;
-			if (count > 1) {
-				return true;
-			}
-		}
-		return false;
+		return this._layers.length > 0;
 	}
 });
 
