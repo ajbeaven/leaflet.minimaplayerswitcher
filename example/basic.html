@@ -20,9 +20,13 @@
 		// create a map in the "map" div, set the view to a given place and zoom
 		var map = L.map('map').setView([51.505, -0.09], 13);
 
-		// add an OpenStreetMap tile layer
-		var cloudmade = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-			attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+		// Stamen maps: http://maps.stamen.com/
+		var toner = L.tileLayer('http://a.tile.stamen.com/toner/{z}/{x}/{y}.png', {
+			attribution: 'http://maps.stamen.com/'
+		});
+
+		var watercolor = L.tileLayer('http://a.tile.stamen.com/watercolor/{z}/{x}/{y}.png', {
+			attribution: 'http://maps.stamen.com/'
 		});
 
 		// add an OpenStreetMap tile layer
@@ -31,7 +35,8 @@
 		});
 
 		L.control.miniMapLayerSwitcher({
-			'CloudMade': cloudmade,
+			'Toner': toner,
+			'Water Color': watercolor,
 			'OpenStreetMap': osm
 		}, {
 			position: 'bottomleft'
