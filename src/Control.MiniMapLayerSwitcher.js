@@ -23,18 +23,36 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 		}
 	},
 
-	onAdd: function () {
-		this._render();
+	addTo: function (map) {
+		var that = this;
 
+		L.Control.prototype.addTo.call(this, map);
+
+		// Invalidate size for each minimap since it has now been added to the DOM
+		this._forEachLayer(function (layerObj) {
+			var layerId = layerObj.id,
+				miniMap = that._miniMaps[layerId];
+
+			miniMap.invalidateSize();
+		});
+
+		this._updateMiniMaps();
+
+		return this;
+	},
+
+	onAdd: function () {
 		this._map
-			.on('move', this._onMapMoved, this)
+			.on('move', this._updateMiniMaps, this)
 			.whenReady(this._onMapReady, this);
+
+		this._render();
 
 		return this._container;
 	},
 
 	onRemove: function () {
-		this._map.off('move', this._onMapMoved, this);
+		this._map.off('move', this._updateMiniMaps, this);
 	},
 
 	_render: function () {
@@ -56,12 +74,12 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 			L.DomEvent.on(container, 'click', this._toggleMiniMaps, this);
 		}
 
+		container.style.height = this.options.miniMapHeight + this.options.miniMapLabelHeight + 'px';
+		container.appendChild(inner);
+
 		this._forEachLayer(function (layerObj) {
 			this._renderMiniMap(layerObj, inner);
 		}, this);
-
-		container.style.height = this.options.miniMapHeight + this.options.miniMapLabelHeight + 'px';
-		container.appendChild(inner);
 
 		// only show the minimap if there are layers to switch between
 		if (!this._hasMultipleLayers()) {
@@ -377,7 +395,7 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 		return miniMap.getContainer().parentNode.parentNode;
 	},
 
-	_onMapMoved: function () {
+	_updateMiniMaps: function () {
 		var defaultLayerId = this._defaultLayerId,
 			isExpanded = L.DomUtil.hasClass(this._container, 'expanded');
 
