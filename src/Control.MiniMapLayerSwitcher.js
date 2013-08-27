@@ -243,6 +243,8 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 			newActiveMiniMapContainer = this._getMiniMapContainer(newActiveLayerId),
 			mapContainer;
 
+		this._moveLayerToBack(newActiveLayer);
+
 		this._defaultLayerId = lastActiveLayerId;
 		this._activeLayerId = newActiveLayerId;
 
@@ -260,6 +262,22 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 		// maps cannot share the same layer, so remove the layers from any map
 		this._map.removeLayer(lastActiveLayer.mainMapLayer);
 		this._map.addLayer(newActiveLayer.mainMapLayer);
+	},
+
+	_moveLayerToBack: function (layer) {
+		var layerId = layer.id,
+			layers = this._layers,
+			layerCount = layers.length,
+			i;
+
+		for (i = 0; i < layerCount; i++) {
+			if (layers[i].id === layerId) {
+				layers.splice(i, 1);
+				break;
+			}
+		}
+
+		layers.push(layer);
 	},
 
 	_animateMiniMaps: function (expand) {
