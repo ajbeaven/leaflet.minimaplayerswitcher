@@ -118,7 +118,7 @@ exports.build = function (compsBase32, buildName) {
 	    outro = '}(this, document));',
 	    newSrc = copy + intro + combineFiles(files) + outro,
 
-	    pathPart = 'dist/leaflet.label' + (buildName ? '-' + buildName : ''),
+	    pathPart = 'dist/leaflet.minimaplayerswitcher' + (buildName ? '-' + buildName : ''),
 	    srcPath = pathPart + '-src.js',
 
 	    oldSrc = loadSilently(srcPath),
