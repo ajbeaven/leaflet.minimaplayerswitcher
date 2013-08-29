@@ -1,25 +1,43 @@
 /* layers control */
 
-.leaflet-mini-map-control-layers {
-	opacity: 0.9;
+.leaflet-left .leaflet-control.leaflet-mini-map-control-layers {
+	-webkit-transform: translate3d(0px, 0px, 0);
+	margin-bottom: 12px;
 }
 
 .leaflet-mini-map-control-layers .map-container {
+	background-color: #fff;
 	border-radius: 4px;
 	cursor: pointer;
 	box-shadow: 0 1px 7px #999;
+	margin-top: -2px;
 	opacity: 0;
-	overflow: hidden;
+	border: 2px solid white;
 	position: absolute;
-		top: 0;
-		left: 0;
+		top: 0px;
+		left: 0px;
 	visibility: hidden;
 	
-	-webkit-transition: all 0.3s ease-in-out;
-	   -moz-transition: all 0.3s ease-in-out;
-	    -ms-transition: all 0.3s ease-in-out;
-	     -o-transition: all 0.3s ease-in-out;
-	        transition: all 0.3s ease-in-out;
+	-webkit-transition-property: left, visibility, width, opacity;
+	   -moz-transition-property: left, visibility, width, opacity;
+	    -ms-transition-property: left, visibility, width, opacity;
+	     -o-transition-property: left, visibility, width, opacity;
+	        transition-property: left, visibility, width, opacity;
+	-webkit-transition-duration: 0.3s;
+	   -moz-transition-duration: 0.3s;
+	    -ms-transition-duration: 0.3s;
+	     -o-transition-duration: 0.3s;
+	        transition-duration: 0.3s;
+	-webkit-transition-timing-function: ease-in-out;
+	   -moz-transition-timing-function: ease-in-out;
+	    -ms-transition-timing-function: ease-in-out;
+	     -o-transition-timing-function: ease-in-out;
+	        transition-timing-function: ease-in-out;
+}
+
+.leaflet-mini-map-control-layers .map-container:hover {
+	background-color: #f5e7ed;
+	border-color: #f5e7ed;
 }
 
 .leaflet-mini-map-control-layers .map-container-inner {
@@ -39,10 +57,11 @@
 	cursor: default;
 }
 
-.leaflet-mini-map-control-layers .active-map {
+.leaflet-mini-map-control-layers .active-map,
+.leaflet-mini-map-control-layers .map-container:hover .map-label {
+	background-color: #f5e7ed;
+	border-color: #f5e7ed;
 	cursor: default;
-	border: 1px solid white;
-	margin: -1px 0 0 -1px;
 }
 
 .leaflet-mini-map-control-layers .default-map {
@@ -64,17 +83,11 @@
 	cursor: pointer;
 }
 
-.leaflet-mini-map-control-layers .map-container:hover .map-label {
-	background-color: rgba(0, 0, 0, 0.44);
-}
-
 .leaflet-mini-map-control-layers .map-label,
 .leaflet-mini-map-control-layers .active-map:hover .map-label {
-	background-color: #000;
-	background-color: rgba(0, 0, 0, 0.33);
-	border-top: 1px solid white;
-	color: white;
-	line-height: 18px;
+	color: #232323;
+	font-weight: bold;
+	line-height: 22px;
 	overflow: hidden;
 	padding: 0 3px;
 	text-align: center;
