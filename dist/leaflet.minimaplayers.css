@@ -1,8 +1,10 @@
 /* layers control */
 
 .leaflet-left .leaflet-control.leaflet-mini-map-control-layers {
+	/* > ie receives a mouseleave event when moving between minimaps if there's a transparent background */
+	background: url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7);
+	margin: 0 0 14px 10px;
 	-webkit-transform: translate3d(0px, 0px, 0);
-	margin-bottom: 12px;
 }
 
 .leaflet-mini-map-control-layers .map-container {
@@ -10,7 +12,6 @@
 	border-radius: 4px;
 	cursor: pointer;
 	box-shadow: 0 1px 7px #999;
-	margin-top: -2px;
 	opacity: 0;
 	border: 2px solid white;
 	position: absolute;
@@ -35,11 +36,6 @@
 	        transition-timing-function: ease-in-out;
 }
 
-.leaflet-mini-map-control-layers .map-container:hover {
-	background-color: #f5e7ed;
-	border-color: #f5e7ed;
-}
-
 .leaflet-mini-map-control-layers .map-container-inner {
 	border-radius: 4px;
 	overflow: hidden;
@@ -58,9 +54,14 @@
 }
 
 .leaflet-mini-map-control-layers .active-map,
-.leaflet-mini-map-control-layers .map-container:hover .map-label {
+.leaflet-mini-map-control-layers .map-container:hover .map-label,
+.leaflet-mini-map-control-layers .map-container:hover {
 	background-color: #f5e7ed;
 	border-color: #f5e7ed;
+}
+
+.leaflet-mini-map-control-layers .active-map,
+.leaflet-mini-map-control-layers .map-container:hover .map-label {
 	cursor: default;
 }
 
