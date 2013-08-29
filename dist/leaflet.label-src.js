@@ -10,7 +10,7 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 	_className: 'leaflet-mini-map-control-layers',
 
 	options: {
-		miniMapLabelHeight: 20,
+		miniMapLabelHeight: 22,
 		miniMapHeight: 80,
 		miniMapWidth: 90,
 		miniMapMargin: 10,
@@ -22,7 +22,7 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 	initialize: function (baseLayers, options) {
 		L.setOptions(this, options);
 
-		this._layers = {};
+		this._layers = [];
 		this._miniMaps = {};
 		this._lastZIndex = 0;
 
@@ -31,18 +31,36 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 		}
 	},
 
-	onAdd: function () {
-		this._render();
+	addTo: function (map) {
+		var that = this;
 
+		L.Control.prototype.addTo.call(this, map);
+
+		this._updateMiniMaps();
+
+		// Invalidate size for each minimap since it has now been added to the DOM
+		this._forEachLayer(function (layerObj) {
+			var layerId = layerObj.id,
+				miniMap = that._miniMaps[layerId];
+
+			miniMap.invalidateSize();
+		});
+
+		return this;
+	},
+
+	onAdd: function () {
 		this._map
-			.on('move', this._onMapMoved, this)
+			.on('move', this._updateMiniMaps, this)
 			.whenReady(this._onMapReady, this);
+
+		this._render();
 
 		return this._container;
 	},
 
 	onRemove: function () {
-		this._map.off('move', this._onMapMoved, this);
+		this._map.off('move', this._updateMiniMaps, this);
 	},
 
 	_render: function () {
@@ -64,12 +82,12 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 			L.DomEvent.on(container, 'click', this._toggleMiniMaps, this);
 		}
 
+		container.style.height = this.options.miniMapHeight + this.options.miniMapLabelHeight + 'px';
+		container.appendChild(inner);
+
 		this._forEachLayer(function (layerObj) {
 			this._renderMiniMap(layerObj, inner);
 		}, this);
-
-		container.style.height = this.options.miniMapHeight + this.options.miniMapLabelHeight + 'px';
-		container.appendChild(inner);
 
 		// only show the minimap if there are layers to switch between
 		if (!this._hasMultipleLayers()) {
@@ -107,8 +125,7 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 			miniMap = this._mapContainer = L.DomUtil.create('div', 'map'),
 			miniMapLabel = L.DomUtil.create('div', 'map-label'),
 			layerId = layerObj.id,
-			layers = this._layers,
-			layer = layers[layerId];
+			layer = this._findLayer(layerId);
 
 		L.DomEvent.on(miniMapContainer, 'click', this._onMiniMapClicked, this);
 
@@ -155,12 +172,6 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 		var id = L.stamp(layer),
 			i, clonedLayer, layerGroupLayer;
 
-		this._layers[id] = {
-			id: id,
-			name: name,
-			mainMapLayer: layer
-		};
-
 		if (layer instanceof L.LayerGroup) {
 			clonedLayer = new L.LayerGroup();
 			for (i in layer._layers) {
@@ -173,12 +184,33 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 			clonedLayer = new L.TileLayer(layer._url, layer.options);
 		}
 
-		this._layers[id].miniMapLayer = clonedLayer;
+		this._layers.push({
+			id: id,
+			name: name,
+			mainMapLayer: layer,
+			miniMapLayer: clonedLayer
+		});
 
 		if (this.options.autoZIndex && layer.setZIndex) {
 			this._lastZIndex++;
 			layer.setZIndex(this._lastZIndex);
 		}
+	},
+
+	_findLayer: function (layerId) {
+		var layers = this._layers,
+			layerCount = layers.length,
+			i, layer;
+
+		for (i = 0; i < layerCount; i++) {
+			layer = layers[i];
+			if (layer.id === layerId) {
+				return layer;
+			}
+		}
+
+		// Returns null if we can't find the layer
+		return null;
 	},
 
 	_getCurrentTarget: function (event) {
@@ -214,7 +246,7 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 			return;
 		}
 
-		clickedMainMapLayer = this._layers[clickedLayerId];
+		clickedMainMapLayer = this._findLayer(clickedLayerId);
 
 		// ensure that if we swap between main/mini maps that it's super quick rather than a transition
 		L.DomUtil.addClass(container, 'notransition');
@@ -231,13 +263,18 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 
 	_switchLayer: function (newActiveLayerId) {
 		var lastActiveLayerId = this._activeLayerId,
-			lastActiveLayer = this._layers[lastActiveLayerId],
-			newActiveLayer = this._layers[newActiveLayerId],
-			lastActiveMiniMapContainer = this._getMiniMapContainer(lastActiveLayerId),
+			lastActiveLayer = this._findLayer(lastActiveLayerId),
+			newActiveLayer = this._findLayer(newActiveLayerId),
 			newActiveMiniMapContainer = this._getMiniMapContainer(newActiveLayerId),
-			mapContainer;
+			mapContainer, suggestedLayerId, suggestedMiniMapContainer;
 
-		this._defaultLayerId = lastActiveLayerId;
+		this._moveLayerToBack(newActiveLayer);
+
+		// Get the new suggested layer vars
+		suggestedLayerId = this._layers[0].id;
+		suggestedMiniMapContainer = this._getMiniMapContainer(suggestedLayerId);
+
+		this._defaultLayerId = suggestedLayerId;
 		this._activeLayerId = newActiveLayerId;
 
 		// set classes for the relevant minimaps
@@ -249,11 +286,26 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 		});
 
 		L.DomUtil.addClass(newActiveMiniMapContainer, 'active-map');
-		L.DomUtil.addClass(lastActiveMiniMapContainer, 'default-map');
+		L.DomUtil.addClass(suggestedMiniMapContainer, 'default-map');
 
 		// maps cannot share the same layer, so remove the layers from any map
 		this._map.removeLayer(lastActiveLayer.mainMapLayer);
 		this._map.addLayer(newActiveLayer.mainMapLayer);
+	},
+
+	_moveLayerToBack: function (activeLayer) {
+		var activeLayerId = activeLayer.id,
+			layers = this._layers,
+			layerCount = layers.length,
+			i;
+
+		for (i = 0; i < layerCount; i++) {
+			if (layers[i].id === activeLayerId) {
+				activeLayer = layers.splice(i, 1)[0];
+				layers.push(activeLayer);
+				break;
+			}
+		}
 	},
 
 	_animateMiniMaps: function (expand) {
@@ -284,7 +336,7 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 		});
 
 		if (expand) {
-			controlContainer.style.width = ((mapsShown + 1) * (mapWidth + mapMargin)) - mapMargin + 'px';
+			controlContainer.style.width = (mapsShown * (mapWidth + mapMargin)) - mapMargin + 'px';
 			L.DomUtil.addClass(controlContainer, 'expanded');
 		} else {
 			controlContainer.style.width = '0';
@@ -334,10 +386,11 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 
 	_forEachLayer: function (callback) {
 		var layers = this._layers,
-			layer, layerId;
+			layerCount = layers.length,
+			layer, i;
 
-		for (layerId in layers) {
-			layer = layers[layerId];
+		for (i = 0; i < layerCount; i++) {
+			layer = layers[i];
 
 			if (callback.call(this, layer) === false) {
 				break;
@@ -350,7 +403,7 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 		return miniMap.getContainer().parentNode.parentNode;
 	},
 
-	_onMapMoved: function () {
+	_updateMiniMaps: function () {
 		var defaultLayerId = this._defaultLayerId,
 			isExpanded = L.DomUtil.hasClass(this._container, 'expanded');
 
@@ -394,22 +447,12 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 	},
 
 	_hasMultipleLayers: function () {
-		var layers = this._layers,
-			count = 0,
-			layerId;
-
-		for (layerId in layers) {
-			count++;
-			if (count > 1) {
-				return true;
-			}
-		}
-		return false;
+		return this._layers.length > 0;
 	}
 });
 
 L.control.miniMapLayerSwitcher = function (baseLayers, options) {
-	return new L.Control.MiniMapLayers(baseLayers, options);
+	return new L.Control.MiniMapLayerSwitcherVersion(baseLayers, options);
 };
 
 }(this, document));
