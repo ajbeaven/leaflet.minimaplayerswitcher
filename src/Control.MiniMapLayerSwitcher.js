@@ -2,7 +2,7 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 	_className: 'leaflet-mini-map-control-layers',
 
 	options: {
-		miniMapLabelHeight: 20,
+		miniMapLabelHeight: 22,
 		miniMapHeight: 80,
 		miniMapWidth: 90,
 		miniMapMargin: 10,
@@ -28,6 +28,8 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 
 		L.Control.prototype.addTo.call(this, map);
 
+		this._updateMiniMaps();
+
 		// Invalidate size for each minimap since it has now been added to the DOM
 		this._forEachLayer(function (layerObj) {
 			var layerId = layerObj.id,
@@ -35,8 +37,6 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 
 			miniMap.invalidateSize();
 		});
-
-		this._updateMiniMaps();
 
 		return this;
 	},
@@ -328,7 +328,7 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 		});
 
 		if (expand) {
-			controlContainer.style.width = ((mapsShown + 1) * (mapWidth + mapMargin)) - mapMargin + 'px';
+			controlContainer.style.width = (mapsShown * (mapWidth + mapMargin)) - mapMargin + 'px';
 			L.DomUtil.addClass(controlContainer, 'expanded');
 		} else {
 			controlContainer.style.width = '0';
