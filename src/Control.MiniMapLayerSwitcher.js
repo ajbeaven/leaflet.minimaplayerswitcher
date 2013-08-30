@@ -266,7 +266,7 @@ L.Control.MiniMapLayerSwitcher = L.Control.extend({
 		suggestedLayerId = this._layers[0].id;
 		suggestedMiniMapContainer = this._getMiniMapContainer(suggestedLayerId);
 
-		this._defaultLayerId = suggestedLayerId;
+		this._suggestedLayerId = suggestedLayerId;
 		this._activeLayerId = newActiveLayerId;
 
 		// set classes for the relevant minimaps
@@ -274,11 +274,11 @@ L.Control.MiniMapLayerSwitcher = L.Control.extend({
 			mapContainer = this._getMiniMapContainer(layerObj.id);
 
 			L.DomUtil.removeClass(mapContainer, 'active-map');
-			L.DomUtil.removeClass(mapContainer, 'default-map');
+			L.DomUtil.removeClass(mapContainer, 'suggested-map');
 		});
 
 		L.DomUtil.addClass(newActiveMiniMapContainer, 'active-map');
-		L.DomUtil.addClass(suggestedMiniMapContainer, 'default-map');
+		L.DomUtil.addClass(suggestedMiniMapContainer, 'suggested-map');
 
 		// maps cannot share the same layer, so remove the layers from any map
 		this._map.removeLayer(lastActiveLayer.mainMapLayer);
@@ -396,7 +396,7 @@ L.Control.MiniMapLayerSwitcher = L.Control.extend({
 	},
 
 	_updateMiniMaps: function () {
-		var defaultLayerId = this._defaultLayerId,
+		var suggestedLayerId = this._suggestedLayerId,
 			isExpanded = L.DomUtil.hasClass(this._container, 'expanded');
 
 		// touch devices can have the container open while scrolling the map
@@ -405,7 +405,7 @@ L.Control.MiniMapLayerSwitcher = L.Control.extend({
 				this._updateMiniMapPosition(layerObj.id);
 			}, this);
 		} else {
-			this._updateMiniMapPosition(defaultLayerId);
+			this._updateMiniMapPosition(suggestedLayerId);
 		}
 	},
 
