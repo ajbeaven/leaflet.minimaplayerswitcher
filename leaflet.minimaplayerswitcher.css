@@ -65,7 +65,7 @@
 	cursor: default;
 }
 
-.leaflet-mini-map-control-layers .default-map {
+.leaflet-mini-map-control-layers .suggested-map {
 	opacity: 1;
 	visibility: visible;
 	z-index: 1;
