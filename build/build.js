@@ -114,8 +114,8 @@ exports.build = function (compsBase32, buildName) {
 	console.log('Concatenating ' + files.length + ' files...');
 
 	var copy = fs.readFileSync('src/copyright.js', 'utf8'),
-	    intro = '(function (window, document, undefined) {\n',
-	    outro = '}(this, document));',
+	    intro = '(function () {\n',
+	    outro = '}());',
 	    newSrc = copy + intro + combineFiles(files) + outro,
 
 	    pathPart = 'dist/leaflet.minimaplayerswitcher' + (buildName ? '-' + buildName : ''),
