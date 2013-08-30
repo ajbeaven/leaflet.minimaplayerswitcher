@@ -1,4 +1,4 @@
-L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
+L.Control.MiniMapLayerSwitcher = L.Control.extend({
 	_className: 'leaflet-mini-map-control-layers',
 
 	options: {
@@ -444,5 +444,5 @@ L.Control.MiniMapLayerSwitcherVersion = L.Control.extend({
 });
 
 L.control.miniMapLayerSwitcher = function (baseLayers, options) {
-	return new L.Control.MiniMapLayerSwitcherVersion(baseLayers, options);
+	return new L.Control.MiniMapLayerSwitcher(baseLayers, options);
 };
