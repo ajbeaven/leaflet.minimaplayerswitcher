@@ -3,7 +3,7 @@
 	(c) 2013, Andrew Beaven, Smartrak
 
 	http://leafletjs.com
-*/(function (window, document, undefined) {
+*/(function () {
 L.miniMapLayerSwitcherVersion = '0.1-dev';
 
 L.Control.MiniMapLayerSwitcher = L.Control.extend({
@@ -455,4 +455,4 @@ L.control.miniMapLayerSwitcher = function (baseLayers, options) {
 	return new L.Control.MiniMapLayerSwitcher(baseLayers, options);
 };
 
-}(this, document));
+}());

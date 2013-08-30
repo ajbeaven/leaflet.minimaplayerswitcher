@@ -1,1 +1,0 @@
-L.miniMapLayerSwitcherVersion = '0.1-dev';
